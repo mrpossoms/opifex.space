@@ -1,4 +1,4 @@
-#include "include/ship.h"
+#include "./include/entities/ship.h"
 
 const OPfloat SHIP_SPAWN_RADIUS = 20.0f;
 
@@ -32,7 +32,8 @@ OPint ShipSpawn(struct Ship* ship, OPuint properties)
 	};
 
 	// update the position
-	ship->position = OPvec3norm(spawnPosition) * SHIP_SPAWN_RADIUS;
+	OPvec3norm(&ship->position, &spawnPosition);
+	ship->position *= SHIP_SPAWN_RADIUS;
 
 	// TODO calculate the orientation to point at the enemy team
 
@@ -58,7 +59,7 @@ void ShipUpdateMovement(struct Ship* ships, OPint count, OPfloat elapsedTime)
 		ship->position += ship->velocity * elapsedTime;
 
 		// update the attitude 
-		OPquatScl(omega, elapsedTime); // angular velocity with respect to time
+		OPquatScl(&omega, elapsedTime); // angular velocity with respect to time
 		ship->attitude = OPquatMul(&ship->attitude, &omega);
 
 		// It might not be realistic, but apply friction to the ship :)

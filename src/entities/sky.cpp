@@ -1,4 +1,4 @@
-#include "include/Entities/sky.h"
+#include "include/entities/sky.h"
 
 // asset proxies
 OPmesh*    meshSkySphere;

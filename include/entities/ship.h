@@ -54,9 +54,9 @@ void ShipBatchDraw(struct Ship* ships, OPint count);
 inline void ShipUpdateReferenceFrame(struct Ship* ship)
 {
 	// update the reference frame with the new attitude
-	ship->frame.up      = OPquatRot(&ship->attitude, OPvec3Up);
-	ship->frame.forward = OPquatRot(&ship->attitude, OPvec3Forward);
-	ship->frame.left    = OPquatRot(&ship->attitude, OPvec3Left);
+	ship->frame.up      = OPquatRot(&ship->attitude, (OPvec3*)&OPvec3Up);
+	ship->frame.forward = OPquatRot(&ship->attitude, (OPvec3*)&OPvec3Forward);
+	ship->frame.left    = OPquatRot(&ship->attitude, (OPvec3*)&OPvec3Left);
 }
 
 inline void ShipThrust(struct Ship* ship, OPvec2 strafe, OPfloat engine, OPfloat elapsedTime)

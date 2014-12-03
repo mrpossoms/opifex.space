@@ -24,21 +24,13 @@ add_external_opifex_includes()
 # Include Files
 add_source_group(\\ "${PROJECT_SOURCE_DIR}/" APPLICATION_SRC)
 add_source_group(include "${PROJECT_SOURCE_DIR}/include" APPLICATION_SRC)
-add_source_group(include/States "${PROJECT_SOURCE_DIR}/include/States" APPLICATION_SRC)
-add_source_group(include/States/SubScreens "${PROJECT_SOURCE_DIR}/include/States/SubScreens" APPLICATION_SRC)
-add_source_group(include/Effects "${PROJECT_SOURCE_DIR}/include/Effects" APPLICATION_SRC)
-add_source_group(include/Entities "${PROJECT_SOURCE_DIR}/include/Entities" APPLICATION_SRC)
-add_source_group(include/Handlers "${PROJECT_SOURCE_DIR}/include/Handlers" APPLICATION_SRC)
-add_source_group(include/Utilities "${PROJECT_SOURCE_DIR}/include/Utilities" APPLICATION_SRC)
+add_source_group(include/states "${PROJECT_SOURCE_DIR}/include/states" APPLICATION_SRC)
+add_source_group(include/entities "${PROJECT_SOURCE_DIR}/include/entities" APPLICATION_SRC)
 
 # Source Files
 add_source_group(src "${PROJECT_SOURCE_DIR}/src" APPLICATION_SRC)
-add_source_group(src/States "${PROJECT_SOURCE_DIR}/src/States" APPLICATION_SRC)
-add_source_group(src/States/SubScreens "${PROJECT_SOURCE_DIR}/src/States/SubScreens" APPLICATION_SRC)
-add_source_group(src/Effects "${PROJECT_SOURCE_DIR}/src/Effects" APPLICATION_SRC)
-add_source_group(src/Entities "${PROJECT_SOURCE_DIR}/src/Entities" APPLICATION_SRC)
-add_source_group(src/Handlers "${PROJECT_SOURCE_DIR}/src/Handlers" APPLICATION_SRC)
-add_source_group(src/Utilities "${PROJECT_SOURCE_DIR}/src/Utilities" APPLICATION_SRC)
+add_source_group(src/states "${PROJECT_SOURCE_DIR}/src/states" APPLICATION_SRC)
+add_source_group(src/entities "${PROJECT_SOURCE_DIR}/src/entities" APPLICATION_SRC)
 
 # BUILD
 add_executable(8_Application ${APPLICATION_SRC})
