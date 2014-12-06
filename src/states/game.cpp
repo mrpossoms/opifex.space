@@ -1,5 +1,7 @@
 #include "./include/states/game.h"
 #include "./include/entities/sky.h"
+#include "./include/entities/ship.h"
+#include "./include/entities/projectile.h"
 
 //    ___                           _   ___         _               _   _             
 //   | __|__ _ ___ __ ____ _ _ _ __| | |   \ ___ __| |__ _ _ _ __ _| |_(_)___ _ _  ___
@@ -33,7 +35,10 @@ OPcam GAME_CAMERA;
 //                                      
 void GSgameEnter(OPgameState* last)
 {
-	initSky();
+	SkyInit();
+	ProjectileInit();
+	ShipInit();
+
 	EFFECT_TEXTURED = OPeffectLoadTextured3D(sizeof(OPMvertexNormalUV));
 	GAME_CAMERA = OPcamProj(
 		OPvec3Zero,
@@ -59,12 +64,14 @@ OPint GSgameUpdate(OPtimer* timer)
 
 void GSgameExit(OPgameState* target)
 {
-	destroySky();
+	SkyDestroy();
+	ProjectileDestroy();
+	ShipDestroy();
 }
 
 void gameDraw(OPfloat dt)
 {
 	OPrenderClear(0.15, 0.15, 0.15);
-	drawSky(&GAME_CAMERA);
+	SkyDraw(&GAME_CAMERA);
 	OPrenderPresent();
 }

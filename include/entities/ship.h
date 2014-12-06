@@ -2,6 +2,7 @@
 #define SPACE_SHIP
 
 #include "./Engine.h"
+#include "./include/states/game.h"
 #include "./include/entities/entity.h"
 
 //-----------------------------------------------------------------------------
@@ -40,10 +41,13 @@ struct Ship{
 //   |  _/ '_/ _ \  _/ _ \  _| || | '_ \/ -_|_-<
 //   |_| |_| \___/\__\___/\__|\_, | .__/\___/__/
 //                            |__/|_|           
+OPint ShipInit();
+OPint ShipDestroy();
+
 OPint ShipSpawn(struct Ship* ship, OPuint properties);
 
 void ShipBatchUpdate(struct Ship* ships, OPint count, OPfloat elapsedTime);
-void ShipBatchDraw(struct Ship* ships, OPint count);
+void ShipBatchDraw(struct Ship* ships, OPint count, OPcam* camera);
 
 //-----------------------------------------------------------------------------
 //    ___      _ _             _    __              _   _             

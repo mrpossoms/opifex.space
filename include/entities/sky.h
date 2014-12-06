@@ -4,8 +4,8 @@
 #include "./Engine.h"
 #include "./include/states/game.h"
 
-void initSky();
-void drawSky(OPcam* camera);
-void destroySky();
+void SkyInit();
+void SkyDraw(OPcam* camera);
+void SkyDestroy();
 
 #endif

@@ -2,6 +2,37 @@
 
 const OPfloat SHIP_SPAWN_RADIUS = 20.0f;
 
+//-----------------------------------------------------------------------------
+//    ___ _        _   _     __   __           
+//   / __| |_ __ _| |_(_)__  \ \ / /_ _ _ _ ___
+//   \__ \  _/ _` |  _| / _|  \ V / _` | '_(_-<
+//   |___/\__\__,_|\__|_\__|   \_/\__,_|_| /__/
+//                                             
+OPmesh*    SHIP_MESH;
+OPtexture* SHIP_COLORMAP;
+
+//-----------------------------------------------------------------------------
+//    ___      _ _   _      _ _         _   _          
+//   |_ _|_ _ (_) |_(_)__ _| (_)_____ _| |_(_)___ _ _  
+//    | || ' \| |  _| / _` | | |_ / _` |  _| / _ \ ' \ 
+//   |___|_||_|_|\__|_\__,_|_|_/__\__,_|\__|_\___/_||_|
+//                                                     
+OPint ShipInit()
+{
+	OPcmanLoad("fighter.opm");
+	OPcmanLoad("fighter.png");
+
+	// snag the mesh and texture for easy of use later
+	SHIP_MESH     = (OPmesh*)OPcmanGet("fighter.opm");
+	SHIP_COLORMAP = (OPtexture*)OPcmanGet("fighter.png");
+}
+
+OPint ShipDestroy()
+{
+	OPcmanUnload("fighter.opm");
+	OPcmanUnload("fighter.png");
+}
+
 OPint ShipSpawn(struct Ship* ship, OPuint properties)
 {
 	OPuint team   = properties & SHIP_TEAM_MASK;
@@ -80,7 +111,23 @@ void ShipBatchUpdate(struct Ship* ships, OPint count, OPfloat elapsedTime)
 //   | |) | '_/ _` \ V  V / | ' \/ _` | | _| || | ' \/ _|  _| / _ \ ' \(_-<
 //   |___/|_| \__,_|\_/\_/|_|_||_\__, | |_| \_,_|_||_\__|\__|_\___/_||_/__/
 //                               |___/                                     
-void ShipBatchDraw(struct Ship* ships, OPint count)
+void ShipBatchDraw(struct Ship* ships, OPint count, OPcam* camera)
 {
+	OPtextureClearActive();
+	OPbindMeshEffectWorldCam(SHIP_MESH, &EFFECT_TEXTURED, (OPmat4*)&OPmat4Identity, camera);
+	OPtextureBind(SHIP_COLORMAP);
+	OPrenderParami("uTexture", 0);
 
+	for(register OPint i = count; i--;){
+		OPmat4 world;
+
+		// create the new world matrix for this ship, then
+		// send it on over to the video card
+		OPmat4buildQuat(&world, &ships[i].attitude);
+		OPmat4translate(&world, &ships[i].position);
+		OPrenderParamMat4("uWorld", &world);
+
+		// finally, render the ship
+		OPrenderMesh();
+	}
 }
