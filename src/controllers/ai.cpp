@@ -24,7 +24,7 @@ struct Ship* nearestShip(struct Ship* me, OPentHeap* enemies)
 
 	return closest;
 }
-
+//-----------------------------------------------------------------------------
 void aiHandler(struct Ship* ship, OPfloat elapsedTime)
 {
 	OPentHeap* targets;
@@ -82,7 +82,7 @@ void aiHandler(struct Ship* ship, OPfloat elapsedTime)
 		ShipThrust(ship, OPvec2Zero, ship->engine = 2.5f, elapsedTime);
 	}
 }
-
+//-----------------------------------------------------------------------------
 struct Controller InitControllerAI(struct Ship* ship)
 {
 	struct Controller controller = {

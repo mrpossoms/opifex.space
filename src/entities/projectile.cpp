@@ -41,6 +41,7 @@ OPint ProjectileInit()
 	OPcmanLoad("Projectile.vert");
 	OPcmanLoad("Projectile.frag");
 
+	// compile and generate the effect used to render the projectiles
 	PROJECTILES_EFFECT = OPrenderGenEffect(
 		"Projectile.vert",
 		"Projectile.frag",
@@ -67,7 +68,7 @@ struct Projectile* ProjectileSpawn(struct Projectile proj)
 		return NULL;
 	}
 
-	proj.life = 5; // fly for 5 seconds
+	proj.life = 2; // fly for 5 seconds
 	PROJECTILES[PROJECTILES_LIVING] = proj; // add the projectile
 	++PROJECTILES_LIVING;
 }

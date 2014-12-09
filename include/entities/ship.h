@@ -22,7 +22,7 @@
 
 #define SHIP_MAX_TEAM_SIZE 20
 
-#define SHIP_GUN_COOLDOWN 0.25f
+#define SHIP_GUN_COOLDOWN 0.125f
 
 //-----------------------------------------------------------------------------
 //    ___ _               _      

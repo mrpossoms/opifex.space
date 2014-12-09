@@ -71,13 +71,13 @@ OPint ShipInit()
 
 	return 1;
 }
-
+//-----------------------------------------------------------------------------
 OPint ShipDestroy()
 {
 	OPcmanUnload("fighter.opm");
 	OPcmanUnload("fighter.png");
 }
-
+//-----------------------------------------------------------------------------
 void ShipReset(struct Ship* ship)
 {
 	OPfloat theta; 
@@ -115,7 +115,7 @@ void ShipReset(struct Ship* ship)
 
 	ShipUpdateReferenceFrame(ship);
 }
-
+//-----------------------------------------------------------------------------
 struct Ship* ShipSpawn(OPuint properties)
 {
 	struct Ship* ship = NULL;
@@ -190,28 +190,26 @@ void shipsUpdate(OPentHeap* ships, OPfloat elapsedTime)
 		}
 	}
 }
-
+//-----------------------------------------------------------------------------
 void ShipBatchUpdate(OPfloat elapsedTime)
 {
 	shipsUpdate(SHIPS_RED, elapsedTime);
 	shipsUpdate(SHIPS_BLUE, elapsedTime);
 }
-
+//-----------------------------------------------------------------------------
 void ShipFire(struct Ship* ship)
 {
 	if(ship->gunCoolDown > 0) return;
 
 	struct Projectile p = {
 		ship->position,                            // starting point of the projectile
-		ship->velocity + ship->frame.forward * -20, // velocity of the projectile
-		ship->properties & SHIP_TEAM_MASK,         // use the ship's team
-		5 // live for 5 seconds
+		ship->velocity + ship->frame.forward * -30, // velocity of the projectile
+		ship->properties & SHIP_TEAM_MASK          // use the ship's team
 	};
 
 	ship->gunCoolDown = SHIP_GUN_COOLDOWN;
 	ProjectileSpawn(p);
 }
-
 
 //-----------------------------------------------------------------------------
 //    ___                  _             ___             _   _             
@@ -252,7 +250,7 @@ void shipDrawTeam(OPentHeap* ships, OPint count, OPcam* camera)
 		OPrenderMesh();
 	}
 }
-
+//-----------------------------------------------------------------------------
 void ShipBatchDraw(OPcam* camera)
 {
 	shipDrawTeam(SHIPS_RED, SHIP_MAX_TEAM_SIZE, camera);
