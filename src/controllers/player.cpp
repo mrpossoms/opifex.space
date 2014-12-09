@@ -47,7 +47,7 @@ void playerHandler(struct Ship* ship, OPfloat elapsedTime)
 		ShipThrust(ship, OPvec2Zero, ship->engine, elapsedTime);
 	}
 	else{
-		ship->engine -= ship->engine * 10 * elapsedTime;
+		ship->engine -= ship->engine * 15 * elapsedTime;
 	}
 
 	int axes;

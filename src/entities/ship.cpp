@@ -78,35 +78,19 @@ OPint ShipDestroy()
 	OPcmanUnload("fighter.png");
 }
 
-struct Ship* ShipSpawn(OPuint properties)
+void ShipReset(struct Ship* ship)
 {
-	struct Ship* ship = NULL;
-	OPint activatedIndex;
-
-	OPuint team   = properties & SHIP_TEAM_MASK;
 	OPfloat theta; 
 
-	switch(team){
+	// select theta for spawn position based on team
+	switch(ship->properties & SHIP_TEAM_MASK){
 		case SHIP_TEAM_RED:
-			OPentHeapActivate(SHIPS_RED, &activatedIndex);
-
-			if(activatedIndex < 0) return NULL;
-
-			ship = ((struct Ship*)SHIPS_RED->Entities) + activatedIndex;
 			theta = 0;
-
 			break;
 		case SHIP_TEAM_BLUE:
-			OPentHeapActivate(SHIPS_BLUE, &activatedIndex);
-
-			if(activatedIndex < 0) return NULL;
-
-			ship = ((struct Ship*)SHIPS_BLUE->Entities) + activatedIndex;
 			theta = OPpi;
 			break;
 	}
-
-	OPbzero(ship, sizeof(struct Ship)); // set all values to zero
 
 	// caculate a new spawn position given the angle determined
 	// by the switch statement above
@@ -120,20 +104,48 @@ struct Ship* ShipSpawn(OPuint properties)
 	OPvec3norm(&ship->position, &spawnPosition);
 	ship->position *= SHIP_SPAWN_RADIUS;
 
-	// reset the rotation
+	// reset the rotation, pointing at the enemy
 	ship->attitude = OPquatCreateLookAt(
 		&ship->position,
 		(OPvec3*)&OPvec3Zero
 	);
 	
-	ship->angularVelocity = OPquatIdentity; // reset the angular velocity too
-	ship->properties = properties;     // assign the properties
-	ship->hp = 3.0f;                   // reset the health
-
-
-	// TODO calculate the orientation to point at the enemy team
+	ship->hp = 3.0f;             // reset the health
+	ship->velocity = OPvec3Zero; // reset velocity    
 
 	ShipUpdateReferenceFrame(ship);
+}
+
+struct Ship* ShipSpawn(OPuint properties)
+{
+	struct Ship* ship = NULL;
+	OPint activatedIndex;
+
+	// determine the team from the properties passed
+	// and select a ship from the heap
+	OPuint team = properties & SHIP_TEAM_MASK;
+	switch(team){
+		case SHIP_TEAM_RED:
+			OPentHeapActivate(SHIPS_RED, &activatedIndex);
+
+			if(activatedIndex < 0) return NULL;
+			
+			ship = ((struct Ship*)SHIPS_RED->Entities) + activatedIndex;
+			break;
+		case SHIP_TEAM_BLUE:
+			OPentHeapActivate(SHIPS_BLUE, &activatedIndex);
+
+			if(activatedIndex < 0) return NULL;
+
+			ship = ((struct Ship*)SHIPS_BLUE->Entities) + activatedIndex;
+			break;
+	}
+
+	if(ship){
+		// keep the properties, they will be needed by the reset function
+		ship->properties = properties;
+		ShipReset(ship);
+	}
 
 	return ship;
 }
@@ -152,31 +164,20 @@ void shipsUpdate(OPentHeap* ships, OPfloat elapsedTime)
 		OPentHeapIsLiving(ships, i); // this will skip ships that are not active (dead)
 
 		struct Ship* ship = (struct Ship*)ships->Entities + i; // proxy pointer for convenience
-		OPquat omega = ship->angularVelocity;                  
 		OPquat decay;
 
 		// skip ships that are dead
 		if(ship->hp <= 0){
-			OPentHeapKill(ships, i); // disable the ship in the ent heap
+			ShipReset(ship); // reset the ship immediately
 			continue;
 		}
-
-		// ShipThrust(ship, OPvec2Zero, 1, elapsedTime);
 
 		// update the position vector in respect to time
 		// PS (this is why operator overloads are cool)
 		ship->position += ship->velocity * elapsedTime;
 
-		// update the attitude 
-		OPquatScl(&omega, elapsedTime); // angular velocity with respect to time
-		ship->attitude = OPquatMul(&ship->attitude, &omega);
-
 		// It might not be realistic, but apply friction to the ship :)
 		ship->velocity -= ship->velocity * elapsedTime * 0.6f;
-
-		omega = OPquatScl(&omega, 0.99);
-		OPquat iTerm = OPquatScl((OPquat*)&OPquatIdentity, 0.01);
-		ship->angularVelocity = OPquatAdd(&iTerm, &omega);
 
 		ShipUpdateReferenceFrame(ship);
 
@@ -202,7 +203,7 @@ void ShipFire(struct Ship* ship)
 
 	struct Projectile p = {
 		ship->position,                            // starting point of the projectile
-		ship->velocity + ship->frame.forward * -10, // velocity of the projectile
+		ship->velocity + ship->frame.forward * -20, // velocity of the projectile
 		ship->properties & SHIP_TEAM_MASK,         // use the ship's team
 		5 // live for 5 seconds
 	};

@@ -20,7 +20,7 @@
 #define SHIP_TEAM_MASK       0b01
 #define SHIP_CONTROLLER_MASK 0b10
 
-#define SHIP_MAX_TEAM_SIZE 10
+#define SHIP_MAX_TEAM_SIZE 20
 
 #define SHIP_GUN_COOLDOWN 0.25f
 
@@ -31,16 +31,16 @@
 //   |___/\__|_|  \_,_\__|\__/__/
 //                               
 struct Ship{
-	OPvec3 position;             // the location of the ship in space
-	OPvec3 velocity;             // the direction, and speed of the ship's motion
-	OPquat attitude;             // representation of the ship's rotation in space
-	OPquat angularVelocity;      // speed and angle at which the ship is spinning
-	struct ReferenceFrame frame; // defines the local coordinate system for the ship
-	OPint  hp;                   // health
-	OPuint properties;           // bit field for storing simple data about the ship
-	OPfloat engine;      // Aesthetic variable to show the engine firing up
-	OPfloat gunCoolDown; // Timer between gun shots
+	OPvec3 position;             // the location of the ship in space (12)
+	OPvec3 velocity;             // the direction, and speed of the ship's motion (12)
+	OPquat attitude;             // representation of the ship's rotation in space (16)
+	struct ReferenceFrame frame; // defines the local coordinate system for the ship (36)
+	OPfloat hp;                   // health (4)
+	OPuint properties;           // bit field for storing simple data about the ship (4)
+	OPfloat engine;      // Aesthetic variable to show the engine firing up (4)
+	OPfloat gunCoolDown; // Timer between gun shots (4)
 };
+// 92 bytes per ship
 
 //-----------------------------------------------------------------------------
 //     ___ _     _          _    

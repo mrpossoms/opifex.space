@@ -5,6 +5,8 @@
 #include "./include/controllers/player.h"
 #include "./include/controllers/ai.h"
 
+#define SPACE_AI_PLAYERS 38
+
 //    ___                           _   ___         _               _   _             
 //   | __|__ _ ___ __ ____ _ _ _ __| | |   \ ___ __| |__ _ _ _ __ _| |_(_)___ _ _  ___
 //   | _/ _ \ '_\ V  V / _` | '_/ _` | | |) / -_) _| / _` | '_/ _` |  _| / _ \ ' \(_-<
@@ -31,7 +33,7 @@ OPeffect EFFECT_TEXTURED;
 OPcam GAME_CAMERA;
 
 struct Controller CONTROLLER_PLAYER;
-struct Controller CONTROLLER_AIS[6];
+struct Controller CONTROLLER_AIS[SPACE_AI_PLAYERS];
 
 //    ___             _   _             
 //   | __|  _ _ _  __| |_(_)___ _ _  ___
@@ -47,7 +49,7 @@ void GSgameEnter(OPgameState* last)
 	// spawn a ship
 	struct Ship* ship = ShipSpawn(SHIP_TEAM_BLUE);
 
-	for(OPint i = 3; i--;){
+	for(OPint i = SPACE_AI_PLAYERS / 2; i--;){
 		CONTROLLER_AIS[i * 2]     = InitControllerAI(ShipSpawn(SHIP_TEAM_BLUE));
 		CONTROLLER_AIS[i * 2 + 1] = InitControllerAI(ShipSpawn(SHIP_TEAM_RED));
 	}	
@@ -56,6 +58,8 @@ void GSgameEnter(OPgameState* last)
 
 	OPvec3 pos = { 0, 0, -10 };
 	EFFECT_TEXTURED = OPeffectLoadTextured3D(sizeof(OPMvertexNormalUV));
+
+	// set up the game camera initially
 	GAME_CAMERA = OPcamProj(
 		pos,
 		ship->position,
@@ -65,8 +69,6 @@ void GSgameEnter(OPgameState* last)
 		90.0f,
 		OPrenderWidth / (OPfloat)OPrenderHeight
 	);
-
-	OPlog("Width %d height %d", OPrenderWidth, OPrenderHeight);
 
 	// clean up any old assets
 	OPcmanPurge();
@@ -79,8 +81,11 @@ OPint GSgameUpdate(OPtimer* timer)
 	ShipBatchUpdate(dt);
 	ProjectileBatchUpdate(dt);
 
+	// update the player's controller
 	CONTROLLER_PLAYER.handler(CONTROLLER_PLAYER.ship, dt);
-	for(OPint i = 6; i--;){
+
+	// now update all the ai
+	for(register OPint i = SPACE_AI_PLAYERS; i--;){
 		CONTROLLER_AIS[i].handler(CONTROLLER_AIS[i].ship, dt);
 	}
 

@@ -115,7 +115,6 @@ void ProjectileBatchUpdate(OPfloat elapsedTime)
 			if(target->hp > 0 && OPvec3dot(&dif, &dif) <= 1.0f){
 				target->hp -= 0.5f;
 				p->life = 0;
-				OPlog("Hit! %f", target->hp);
 				break;
 			}
 		}

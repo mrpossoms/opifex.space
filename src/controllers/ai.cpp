@@ -4,16 +4,14 @@ struct Ship* nearestShip(struct Ship* me, OPentHeap* enemies)
 {
 	struct Ship* allEnemies = (struct Ship*)enemies->Entities;
 	struct Ship* closest = allEnemies;
-	OPvec3 dif = closest->position - me->position;
-	OPfloat dist = OPvec3dot(&dif, &dif);
+	OPfloat dist = OPvec3distSquare(&closest->position, &me->position);
 
 	for(register OPint i = enemies->MaxIndex; i--;){
 		OPentHeapIsLiving(enemies, i);
 
-		dif = allEnemies[i].position - me->position;
-		OPfloat newDist = OPvec3dot(&dif, &dif);
+		OPfloat newDist = OPvec3distSquare(&allEnemies[i].position, &me->position);
 
-		if(newDist < dist){
+		if(newDist < dist && closest->hp > 0){
 			dist = newDist;
 			closest = allEnemies + i;
 		}
@@ -46,13 +44,22 @@ void aiHandler(struct Ship* ship, OPfloat elapsedTime)
 	OPquat rotation;
 	OPfloat angle = 1.5f * elapsedTime;
 
-	if(0 && target){
+	if(target){
 		// attack the ship!
+		OPquat targetOrientation = OPquatCreateLookAt(&ship->position, &target->position);
+		ship->attitude = OPquatLerp(&targetOrientation, &ship->attitude, elapsedTime * 2 * OPrandom());
+
+		// fire if close enough, but also randomize
+		if(OPvec3distSquare(&target->position, &ship->position) < 100 * OPrandom() && OPrandom() < 0.5f){
+			ShipFire(ship);
+		}
+
+		// accelerate!
+		ShipThrust(ship, OPvec2Zero, ship->engine = 2.5f, elapsedTime);
 	}
 	else{
-		// do stuff
+		// Select a rotation manuver at random.
 		OPint action = OPrandom() * 3;
-
 		switch(action){
 			case 0:
 				rotation = OPquatCreateRot((OPvec3*)&ship->frame.up, angle);
@@ -67,12 +74,13 @@ void aiHandler(struct Ship* ship, OPfloat elapsedTime)
 				netRotation = OPquatMul(&netRotation, &rotation);
 				break;
 		}
+	
+		// apply the rotaion
+		ship->attitude = OPquatMul(&ship->attitude, &netRotation);
+
+		// accelerate!
+		ShipThrust(ship, OPvec2Zero, ship->engine = 2.5f, elapsedTime);
 	}
-
-	ship->attitude = OPquatMul(&ship->attitude, &netRotation);
-
-	// accelerate!
-	ShipThrust(ship, OPvec2Zero, ship->engine = 2.5f, elapsedTime);
 }
 
 struct Controller InitControllerAI(struct Ship* ship)
