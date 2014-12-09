@@ -3,11 +3,6 @@
 
 #include "./Engine.h"
 
-struct Entity{
-	OPvec3  Position;
-	OPfloat Scale;
-};
-
 struct ReferenceFrame{
 	OPvec3 up;
 	OPvec3 forward;

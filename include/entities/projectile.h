@@ -2,6 +2,7 @@
 #define SPACE_PROJECTILE
 
 #include "./Engine.h"
+#include "./include/entities/ship.h"
 
 //-----------------------------------------------------------------------------
 //    ___ _               _      
@@ -12,7 +13,7 @@
 struct Projectile{
 	OPvec3    position;
 	OPvec3    velocity;
-	OPint   owner;
+	OPint   team;
 	OPfloat life;
 };
 

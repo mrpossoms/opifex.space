@@ -2,6 +2,9 @@ varying vec2 vUV;
 varying vec3 vNormal;
 
 uniform sampler2D uTexture;
+uniform sampler2D uEngineMask;
+
+uniform float uEnginePower;
 
 void main(void){
 	// lighting calculations
@@ -10,8 +13,10 @@ void main(void){
 
 	// color operations
 	vec4 textel = texture2D(uTexture, vUV);
+	vec4 engine = texture2D(uEngineMask, vUV);
 	vec3 color = textel.xyz;
-	vec3 diffuse = color * ndl;
+	vec3 diffuse = color * min(max(0.0, ndl * 0.8) + engine.a * uEnginePower, 0.8);
+	vec3 ambient = color * vec3(0.2, 0.2, 0.2);
 
-	gl_FragColor = vec4(diffuse, textel.a);
+	gl_FragColor = vec4(diffuse + ambient, textel.a);
 }

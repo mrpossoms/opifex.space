@@ -4,6 +4,7 @@
 #include "./Engine.h"
 #include "./include/states/game.h"
 #include "./include/entities/entity.h"
+#include "./include/entities/projectile.h"
 
 //-----------------------------------------------------------------------------
 //     ___             _            _      
@@ -19,6 +20,10 @@
 #define SHIP_TEAM_MASK       0b01
 #define SHIP_CONTROLLER_MASK 0b10
 
+#define SHIP_MAX_TEAM_SIZE 10
+
+#define SHIP_GUN_COOLDOWN 0.25f
+
 //-----------------------------------------------------------------------------
 //    ___ _               _      
 //   / __| |_ _ _ _  _ __| |_ ___
@@ -33,7 +38,17 @@ struct Ship{
 	struct ReferenceFrame frame; // defines the local coordinate system for the ship
 	OPint  hp;                   // health
 	OPuint properties;           // bit field for storing simple data about the ship
+	OPfloat engine;      // Aesthetic variable to show the engine firing up
+	OPfloat gunCoolDown; // Timer between gun shots
 };
+
+//-----------------------------------------------------------------------------
+//     ___ _     _          _    
+//    / __| |___| |__  __ _| |___
+//   | (_ | / _ \ '_ \/ _` | (_-<
+//    \___|_\___/_.__/\__,_|_/__/
+//                               
+extern OPentHeap *SHIPS_BLUE, *SHIPS_RED;
 
 //-----------------------------------------------------------------------------
 //    ___         _       _                     
@@ -44,10 +59,11 @@ struct Ship{
 OPint ShipInit();
 OPint ShipDestroy();
 
-OPint ShipSpawn(struct Ship* ship, OPuint properties);
+struct Ship* ShipSpawn(OPuint properties);
+void ShipFire(struct Ship* ship);
 
-void ShipBatchUpdate(struct Ship* ships, OPint count, OPfloat elapsedTime);
-void ShipBatchDraw(struct Ship* ships, OPint count, OPcam* camera);
+void ShipBatchUpdate(OPfloat elapsedTime);
+void ShipBatchDraw(OPcam* camera);
 
 //-----------------------------------------------------------------------------
 //    ___      _ _             _    __              _   _             
@@ -75,7 +91,7 @@ inline void ShipThrust(struct Ship* ship, OPvec2 strafe, OPfloat engine, OPfloat
 	// apply the net acceleration to the ship
 	ship->velocity += frame->up * strafe.y + 
 	                  frame->left * strafe.x +
-	                  frame->forward * engine;
+	                  frame->forward * -engine;
 }
 
 #endif

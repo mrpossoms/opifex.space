@@ -17,11 +17,16 @@ void SkyInit()
 
 void SkyDraw(OPcam* camera)
 {
+	OPmat4 world = OPmat4createScl(100, 100, 100);
+	OPmat4translate(&world, &OPcamGetPosition(camera));
+
+	OPrenderDepth(0);
 	OPtextureClearActive();
-	OPbindMeshEffectWorldCam(SKY_MESH, &EFFECT_TEXTURED, (OPmat4*)&OPmat4Identity, camera);
+	OPbindMeshEffectWorldCam(SKY_MESH, &EFFECT_TEXTURED, &world, camera);
 	OPtextureBind(SKY_COLORMAP);
 	OPrenderParami("uTexture", 0);
 	OPrenderMesh();
+	OPrenderDepth(1);
 }
 
 void SkyDestroy()

@@ -27,6 +27,8 @@
 //                                             
 struct Projectile PROJECTILES[SPACE_PROJECTILES];
 OPint PROJECTILES_LIVING;
+OPeffect PROJECTILES_EFFECT;
+OPmesh   PROJECTILES_QUAD;
 
 //-----------------------------------------------------------------------------
 //    ___      _ _   _      _ _         _   _          
@@ -36,12 +38,25 @@ OPint PROJECTILES_LIVING;
 //               
 OPint ProjectileInit()
 {
+	OPcmanLoad("Projectile.vert");
+	OPcmanLoad("Projectile.frag");
 
+	PROJECTILES_EFFECT = OPrenderGenEffect(
+		"Projectile.vert",
+		"Projectile.frag",
+		OPATTR_POSITION | OPATTR_UV,
+		"Projectile Effect",
+		0
+	);
+
+	PROJECTILES_QUAD = OPquadCreate();
 }
 
 OPint ProjectileDestroy()
 {
-
+	OPcmanUnload("Projectile.vert");
+	OPcmanUnload("Projectile.frag");
+	OPrenderUnloadEffect(&PROJECTILES_EFFECT);
 }
 
 struct Projectile* ProjectileSpawn(struct Projectile proj)
@@ -53,6 +68,8 @@ struct Projectile* ProjectileSpawn(struct Projectile proj)
 	}
 
 	proj.life = 5; // fly for 5 seconds
+	PROJECTILES[PROJECTILES_LIVING] = proj; // add the projectile
+	++PROJECTILES_LIVING;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +80,7 @@ struct Projectile* ProjectileSpawn(struct Projectile proj)
 //         |_|              
 void ProjectileBatchUpdate(OPfloat elapsedTime)
 {
-	for(OPint i = PROJECTILES_LIVING; i--;){
+	for(register OPint i = PROJECTILES_LIVING; i--;){
 		// proxy variable for the current projectile
 		struct Projectile* p = PROJECTILES + i;
 
@@ -76,6 +93,31 @@ void ProjectileBatchUpdate(OPfloat elapsedTime)
 			// swap the last living proj with the one that just
 			// died. This keeps living projectiles contiguous	
 			PROJ_KILL_AND_SWAP(i);
+			continue;
+		}
+
+		OPentHeap* targets;
+
+		if((p->team & SHIP_TEAM_MASK) == SHIP_TEAM_RED){
+			targets = SHIPS_BLUE;
+		}
+		else{
+			targets = SHIPS_RED;
+		}
+
+		// check for collisions against ships
+		for(register OPint j = targets->MaxIndex; j--;){
+			OPentHeapIsLiving(targets, j); // this will skip ships that are not active (dead)
+
+			struct Ship* target = ((struct Ship*)targets->Entities) + j;
+
+			OPvec3 dif = p->position - target->position;
+			if(target->hp > 0 && OPvec3dot(&dif, &dif) <= 1.0f){
+				target->hp -= 0.5f;
+				p->life = 0;
+				OPlog("Hit! %f", target->hp);
+				break;
+			}
 		}
 	}
 }
@@ -88,7 +130,27 @@ void ProjectileBatchUpdate(OPfloat elapsedTime)
 //                               |___/                                     
 void ProjectileBatchDraw(OPcam* camera)
 {
-	for(OPint i = PROJECTILES_LIVING; i--;){
+	OPvec4 red  = { 1, 0, 0, 1 };
+	OPvec4 blue = { 0, 0, 1, 1 };
 
+	OPrenderBlendAdditive();
+	OPrenderDepthWrite(0);
+	OPbindMeshEffectWorldCam(&PROJECTILES_QUAD, &PROJECTILES_EFFECT, (OPmat4*)&OPmat4Identity, camera);
+
+	for(register OPint i = PROJECTILES_LIVING; i--;){
+		struct Projectile* p = PROJECTILES + i;
+		
+		OPrenderParamVec3("uPosition", &p->position);
+		if(p->team == SHIP_TEAM_RED){
+			OPrenderParamVec4("uColor", &red);
+		}
+		else{
+			OPrenderParamVec4("uColor", &blue);
+		}
+
+		OPrenderMesh();
 	}
+
+	OPrenderDepthWrite(1);
+	OPrenderBlendAlpha();
 }

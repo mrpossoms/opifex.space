@@ -6,4 +6,6 @@
 extern OPgameState GS_GAME;
 extern OPeffect EFFECT_TEXTURED;
 
+extern OPcam GAME_CAMERA;
+
 #endif
