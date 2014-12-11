@@ -5,7 +5,7 @@
 #include "./include/controllers/player.h"
 #include "./include/controllers/ai.h"
 
-#define SPACE_AI_PLAYERS 38
+#define SPACE_AI_PLAYERS ((SHIP_MAX_TEAM_SIZE * 2) - 2)
 
 //    ___                           _   ___         _               _   _             
 //   | __|__ _ ___ __ ____ _ _ _ __| | |   \ ___ __| |__ _ _ _ __ _| |_(_)___ _ _  ___
@@ -49,12 +49,13 @@ void GSgameEnter(OPgameState* last)
 	// spawn a ship
 	struct Ship* ship = ShipSpawn(SHIP_TEAM_BLUE);
 
+	CONTROLLER_PLAYER = InitControllerPlayer(ship);
+
 	for(OPint i = SPACE_AI_PLAYERS / 2; i--;){
 		CONTROLLER_AIS[i * 2]     = InitControllerAI(ShipSpawn(SHIP_TEAM_BLUE));
 		CONTROLLER_AIS[i * 2 + 1] = InitControllerAI(ShipSpawn(SHIP_TEAM_RED));
 	}	
 
-	CONTROLLER_PLAYER = InitControllerPlayer(ship);
 
 	OPvec3 pos = { 0, 0, -10 };
 	EFFECT_TEXTURED = OPeffectLoadTextured3D(sizeof(OPMvertexNormalUV));

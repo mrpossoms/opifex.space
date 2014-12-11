@@ -17,7 +17,9 @@ void ApplicationInit() {
 
 	OPaudInit();
 	OPaudInitThread(100);
-	
+
+	// OPrenderFullscreen = 1;
+	OPrenderSetScreenSize(800, 600);
 	OPrenderInit();
 	OPlog("Rendering initialized");
 	OPsprite2DInit(NULL);

@@ -51,15 +51,19 @@ OPint ProjectileInit()
 	);
 
 	PROJECTILES_QUAD = OPquadCreate();
-}
 
+	return 0;
+}
+//-----------------------------------------------------------------------------
 OPint ProjectileDestroy()
 {
 	OPcmanUnload("Projectile.vert");
 	OPcmanUnload("Projectile.frag");
 	OPrenderUnloadEffect(&PROJECTILES_EFFECT);
-}
 
+	return 0;
+}
+//-----------------------------------------------------------------------------
 struct Projectile* ProjectileSpawn(struct Projectile proj)
 {
 	// if we used up all the available projectiles (ie)
@@ -71,6 +75,8 @@ struct Projectile* ProjectileSpawn(struct Projectile proj)
 	proj.life = 2; // fly for 5 seconds
 	PROJECTILES[PROJECTILES_LIVING] = proj; // add the projectile
 	++PROJECTILES_LIVING;
+
+	return PROJECTILES + PROJECTILES_LIVING - 1;
 }
 
 //-----------------------------------------------------------------------------

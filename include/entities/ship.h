@@ -14,13 +14,10 @@
 //                                         
 #define SHIP_TEAM_RED         0b00
 #define SHIP_TEAM_BLUE        0b01
-#define SHIP_CONTROLLER_AI    0b00
-#define SHIP_CONTROLLER_HUMAN 0b10
 
 #define SHIP_TEAM_MASK       0b01
-#define SHIP_CONTROLLER_MASK 0b10
 
-#define SHIP_MAX_TEAM_SIZE 20
+
 
 #define SHIP_GUN_COOLDOWN 0.125f
 
@@ -41,6 +38,8 @@ struct Ship{
 	OPfloat gunCoolDown; // Timer between gun shots (4)
 };
 // 92 bytes per ship
+
+#define SHIP_MAX_TEAM_SIZE ((12 * 1024) / sizeof(struct Ship))
 
 //-----------------------------------------------------------------------------
 //     ___ _     _          _    
